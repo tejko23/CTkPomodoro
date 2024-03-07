@@ -1,5 +1,7 @@
 import customtkinter
 
+from spinbox import Spinbox
+
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
@@ -18,6 +20,14 @@ class App(customtkinter.CTk):
                         pady=20, 
                         sticky='ew', 
                         columnspan=2)
+        
+        self.spinbox = Spinbox(self, step_size=5)
+        self.spinbox.grid(row=1, 
+                          column=0, 
+                          padx=20, 
+                          pady=20, 
+                          sticky="ew", 
+                          columnspan=2)
         
 
 if __name__ == '__main__':
