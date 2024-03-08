@@ -1,3 +1,4 @@
+import datetime
 from typing import Callable, Union
 
 import customtkinter
@@ -38,7 +39,7 @@ class Spinbox(customtkinter.CTkFrame):
                                                   height=height-6,
                                                   command=self.add_button_callback)
         self.add_button.grid(row=0, column=2, padx=(0, 3), pady=3)
-        self.entry.configure(text="25")
+        self.entry.configure(text="5")
 
     def add_button_callback(self):
         if self.command is not None:
@@ -46,7 +47,7 @@ class Spinbox(customtkinter.CTkFrame):
         try:
             value = int(self.entry.cget("text"))  + self.step_size
             value = 60 if value > 60 else value
-            self.entry.configure(text=value)
+            self.entry.configure(text=str(value))
         except ValueError:
             return
 
@@ -56,13 +57,13 @@ class Spinbox(customtkinter.CTkFrame):
         try:
             value = int(self.entry.cget("text")) - self.step_size
             value = 5 if value < 5 else value
-            self.entry.configure(text=value)
+            self.entry.configure(text=str(value))
         except ValueError:
             return
 
     def get(self) -> Union[int, None]:
         try:
-            return int(self.entry.cget("text"))
+            return self.entry.cget("text")
         except ValueError:
             return None
 
