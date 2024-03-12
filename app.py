@@ -4,6 +4,7 @@ import time
 import customtkinter
 
 from spinbox import Spinbox
+from timer import Timer
 
 class App(customtkinter.CTk):
     def __init__(self):
@@ -25,7 +26,7 @@ class App(customtkinter.CTk):
                         sticky='ew', 
                         columnspan=2)
         
-        self.spinbox = Spinbox(self, step_size=5)
+        self.spinbox = Spinbox(self, entry="5", step_size=1)
         self.spinbox.grid(row=1, 
                           column=0, 
                           padx=20, 
@@ -34,8 +35,8 @@ class App(customtkinter.CTk):
                           columnspan=2)
         
         self.update_btn = customtkinter.CTkButton(self, 
-                                              text="Update", 
-                                              command=self.update)
+                                              text="Set time", 
+                                              command=self.set_time)
         self.update_btn.grid(row=2, 
                           column=0, 
                           padx=20, 
@@ -45,7 +46,7 @@ class App(customtkinter.CTk):
         
         self.button = customtkinter.CTkButton(self, 
                                               text="Start", 
-                                              command=self.start)
+                                              command=self.manage)
         self.button.grid(row=3, 
                           column=0, 
                           padx=20, 
@@ -54,29 +55,33 @@ class App(customtkinter.CTk):
                           columnspan=2)
         
         
-        self.timer = customtkinter.CTkLabel(self,  
+        self.timer_label = customtkinter.CTkLabel(self,  
                                             font=customtkinter.CTkFont(
                                                 size=50
                                                 ))
-        self.timer.grid(row=4, 
+        self.timer_label.grid(row=4, 
                           column=0, 
                           padx=20, 
                           pady=20, 
                           sticky="ew", 
                           columnspan=2)
         
-        self.set_timer(self.spinbox.get())
+        self.timer = Timer(self.spinbox.get())
         
-    def set_timer(self, minutes: str):
-        dt_obj = datetime.datetime.strptime(minutes, "%M")
-        dt_str = datetime.datetime.strftime(dt_obj, "%M:%S")
-        self.timer.configure(text=dt_str)
+        self.set_timer_label()
+        
+    def set_timer_label(self):
+        time = self.timer.get_current_str_time()
+        self.timer_label.configure(text=time)
 
+    def set_time(self):
+        self.timer.set_time(self.spinbox.get())
+        self.set_timer_label()
 
-    def start(self):
+    def manage(self):
         if not self.started:
-            if self.timer.cget("text") == "00:00":
-                self.update()
+            if self.timer.is_finished():
+                self.set_time()
             self.started = True
             self.button.configure(text="Stop")
             self.pomodoro()
@@ -86,18 +91,13 @@ class App(customtkinter.CTk):
 
     def pomodoro(self):
         if self.started:
-            t = datetime.datetime.strptime(self.timer.cget("text"), "%M:%S")
-            td = datetime.timedelta(hours=t.hour, minutes=t.minute, seconds=t.second)
-            if td > datetime.timedelta.resolution:
-                t = t - datetime.timedelta(seconds=1)
-                self.timer.configure(text=datetime.datetime.strftime(t, "%M:%S"))
-            if td == datetime.timedelta(seconds=0):
+            self.timer.process()
+            self.set_timer_label()
+            if self.timer.is_finished():
                 self.bell()
-            self.timer.after(1000, self.pomodoro)
+            self.after(1000, self.pomodoro)
 
 
-    def update(self):
-        self.set_timer(self.spinbox.get())
 
 
         
