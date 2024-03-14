@@ -1,29 +1,36 @@
 from datetime import datetime, timedelta
 
 class Timer:
-    def __init__(self, time):
-        self.time = self._str_minutes_to_datetime(time)
+    def __init__(self, time: str):
+        self._time = None
+        self._delta = None
+        self.time = time 
+
+    def __str__(self) -> str:
+        return self.time
+
+    @property 
+    def time(self) -> str: 
+        return datetime.strftime(self._time, "%M:%S")
+
+    @time.setter 
+    def time(self, time_value: str) -> None: 
+        if not isinstance(time_value, str):
+            raise ValueError(f"{time_value} must be str.") 
+        self._time = datetime.strptime(time_value, "%M")
+        self._update_delta()
         
-    def _str_minutes_to_datetime(self, minutes: str) -> datetime:
-        return datetime.strptime(minutes, "%M")
-    
+    def _update_delta(self) -> None:
+        self._delta = timedelta(hours=self._time.hour,
+                                minutes=self._time.minute,
+                                seconds=self._time.second)
+        
     def process(self):
-        delta = timedelta(hours=self.time.hour,
-                          minutes=self.time.minute,
-                          seconds=self.time.second)
-        if delta > timedelta.resolution:
-            self.time -= timedelta(seconds=1)
-        
-    def get_current_str_time(self) -> str:
-        return datetime.strftime(self.time, "%M:%S")
-    
-    def set_time(self, minutes: str):
-        self.time = self._str_minutes_to_datetime(minutes)
+        if self._delta > timedelta.resolution:
+            self._time -= timedelta(seconds=1)
+            self._update_delta()
 
     def is_finished(self) -> bool:
-        delta = timedelta(hours=self.time.hour,
-                          minutes=self.time.minute,
-                          seconds=self.time.second)
-        if delta == timedelta(seconds=0):
+        if self._delta == timedelta(seconds=0):
             return True
         return False

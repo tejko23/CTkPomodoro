@@ -71,11 +71,10 @@ class App(customtkinter.CTk):
         self.set_timer_label()
         
     def set_timer_label(self):
-        time = self.timer.get_current_str_time()
-        self.timer_label.configure(text=time)
+        self.timer_label.configure(text=self.timer)
 
     def set_time(self):
-        self.timer.set_time(self.spinbox.get())
+        self.timer.time = self.spinbox.get()
         self.set_timer_label()
 
     def manage(self):
@@ -97,10 +96,6 @@ class App(customtkinter.CTk):
                 self.bell()
             self.after(1000, self.pomodoro)
 
-
-
-
-        
 
 if __name__ == '__main__':
     app = App()
