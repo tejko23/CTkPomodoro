@@ -4,12 +4,11 @@ import time
 import customtkinter
 
 from spinbox import Spinbox
-from timer import Timer
+from timer import TimeCounter
 
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
-        self.started = False
 
         self.title("Pomodoro")
         self.geometry("400x400")
@@ -66,35 +65,36 @@ class App(customtkinter.CTk):
                           sticky="ew", 
                           columnspan=2)
         
-        self.timer = Timer(self.spinbox.get())
+        self.timer = TimeCounter(self.spinbox.get())
         
-        self.set_timer_label()
+        self.refresh_timer_label()
         
-    def set_timer_label(self):
+    def refresh_timer_label(self):
         self.timer_label.configure(text=self.timer)
 
     def set_time(self):
         self.timer.time = self.spinbox.get()
-        self.set_timer_label()
+        self.refresh_timer_label()
 
     def manage(self):
-        if not self.started:
-            if self.timer.is_finished():
+        if not self.timer.is_running:
+            if self.timer.is_finished:
                 self.set_time()
-            self.started = True
+            self.timer.toggle()
             self.button.configure(text="Stop")
             self.pomodoro()
         else:
-            self.started = False
+            self.timer.toggle()
             self.button.configure(text="Start")
 
     def pomodoro(self):
-        if self.started:
-            self.timer.process()
-            self.set_timer_label()
-            if self.timer.is_finished():
+        if self.timer.is_running:
+            sleep = 200
+            self.refresh_timer_label()
+            if self.timer.is_finished:
+                sleep = 1000
                 self.bell()
-            self.after(1000, self.pomodoro)
+            self.after(sleep, self.pomodoro)
 
 
 if __name__ == '__main__':
