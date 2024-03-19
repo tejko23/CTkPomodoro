@@ -7,6 +7,7 @@ class Spinbox(customtkinter.CTkFrame):
     def __init__(self, *args,
                  width: int = 100,
                  height: int = 32,
+                 entry: str = "5",
                  step_size: Union[int, float] = 1,
                  command: Callable = None,
                  **kwargs
@@ -22,10 +23,10 @@ class Spinbox(customtkinter.CTkFrame):
         self.grid_columnconfigure(1, weight=1)
 
         self.subtract_button = customtkinter.CTkButton(self, 
-                                                       text="-", 
-                                                       width=height-6, 
-                                                       height=height-6,
-                                                       command=self.subtract_button_callback)
+                                        text="-", 
+                                        width=height-6, 
+                                        height=height-6,
+                                        command=self.subtract_button_callback)
         self.subtract_button.grid(row=0, column=0, padx=(3, 0), pady=3)
 
         self.entry = customtkinter.CTkLabel(self, 
@@ -34,32 +35,34 @@ class Spinbox(customtkinter.CTkFrame):
         self.entry.grid(row=0, column=1, columnspan=1, padx=3, pady=3, sticky="ew")
 
         self.add_button = customtkinter.CTkButton(self, 
-                                                  text="+", 
-                                                  width=height-6, 
-                                                  height=height-6,
-                                                  command=self.add_button_callback)
+                                        text="+", 
+                                        width=height-6, 
+                                        height=height-6,
+                                        command=self.add_button_callback)
         self.add_button.grid(row=0, column=2, padx=(0, 3), pady=3)
-        self.entry.configure(text="5")
+        self.entry.configure(text=entry)
 
     def add_button_callback(self):
-        if self.command is not None:
-            self.command()
         try:
             value = int(self.entry.cget("text"))  + self.step_size
             value = 60 if value > 60 else value
             self.entry.configure(text=str(value))
         except ValueError:
             return
+        else:
+            if self.command is not None:
+                self.command()
 
     def subtract_button_callback(self):
-        if self.command is not None:
-            self.command()
         try:
             value = int(self.entry.cget("text")) - self.step_size
-            value = 5 if value < 5 else value
+            value = self.step_size if value < self.step_size else value
             self.entry.configure(text=str(value))
         except ValueError:
             return
+        else:
+            if self.command is not None:
+                self.command()
 
     def get(self) -> Union[int, None]:
         try:
