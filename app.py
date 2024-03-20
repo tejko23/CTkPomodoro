@@ -13,6 +13,8 @@ class App(customtkinter.CTk):
         self.title("Pomodoro")
         self.geometry("400x400")
         self.grid_columnconfigure((0, 1), weight=1)
+        
+        self.timer = TimeCounter(ConfigManager().load_param("pomodoro_time"))
 
         self.header_frame = AppHeaderFrame(self)
         self.header_frame.grid(row=0,
@@ -32,16 +34,13 @@ class App(customtkinter.CTk):
                           sticky="ew", 
                           columnspan=2)
         
-        self.timer_label = customtkinter.CTkLabel(self,  
-                                            font=customtkinter.CTkFont(
-                                                size=50
-                                                ))
-        self.timer_label.grid(row=2, 
-                          column=0, 
-                          padx=20, 
-                          pady=20, 
-                          sticky="ew", 
-                          columnspan=2)
+        self.clock = ClockFrame(self, time=self.timer)
+        self.clock.grid(row=2,
+                        column=0,
+                        padx=20,
+                        pady=20,
+                        sticky='ew',
+                        columnspan=2)
         
         self.button = customtkinter.CTkButton(self, 
                                               text="Start", 
@@ -52,18 +51,10 @@ class App(customtkinter.CTk):
                           pady=20, 
                           sticky="ew", 
                           columnspan=2)
-        
-        self.timer = TimeCounter(ConfigManager().load_param("pomodoro_time"))
-        
-        self.refresh_timer_label()
-
-        
-    def refresh_timer_label(self):
-        self.timer_label.configure(text=self.timer)
 
     def set_time(self):
         self.timer.time = ConfigManager().load_param("pomodoro_time")
-        self.refresh_timer_label()
+        self.clock.time = self.timer
 
     def manage(self):
         if not self.timer.is_running:
@@ -79,7 +70,7 @@ class App(customtkinter.CTk):
     def pomodoro(self):
         if self.timer.is_running:
             sleep = 200
-            self.refresh_timer_label()
+            self.clock.time = self.timer
             if self.timer.is_finished:
                 sleep = 1000
                 self.bell()
@@ -130,6 +121,33 @@ class AppHeaderFrame(customtkinter.CTkFrame):
             self.settings_window = SettingsWindow(self)
         else:
             self.settings_window.focus()
+
+
+class ClockFrame(customtkinter.CTkFrame):
+    def __init__(self, master, 
+                 time: str = "10:00"):
+        super().__init__(master)
+        
+        self.grid_columnconfigure(0, weight=1)
+        
+        self.label = customtkinter.CTkLabel(self,  
+                                            font=customtkinter.CTkFont(
+                                                size=50
+                                            ),
+                                            text=time)
+        self.label.grid(row=0, 
+                        column=0, 
+                        padx=10, 
+                        pady=10, 
+                        sticky="ew")
+        
+    @property
+    def time(self) -> str:
+        return self.label.cget("text")
+    
+    @time.setter
+    def time(self, value: str):
+        self.label.configure(text=value)
 
 
 if __name__ == '__main__':
