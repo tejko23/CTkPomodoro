@@ -2,8 +2,7 @@ from tkinter import ttk
 
 import customtkinter
 
-from settings import SettingsWindow, ConfigManager
-from timer import TimeCounter
+from settings import SettingsWindow
 
 
 class App(customtkinter.CTk):
@@ -13,8 +12,6 @@ class App(customtkinter.CTk):
         self.title("Pomodoro")
         self.geometry("400x400")
         self.grid_columnconfigure((0, 1), weight=1)
-        
-        self.timer = TimeCounter(ConfigManager().load_param("pomodoro_time"))
 
         self.header_frame = AppHeaderFrame(self)
         self.header_frame.grid(row=0,
@@ -25,8 +22,7 @@ class App(customtkinter.CTk):
                                columnspan=2)
         
         self.update_btn = customtkinter.CTkButton(self, 
-                                              text="Reload time", 
-                                              command=self.set_time)
+                                              text="Reload time")
         self.update_btn.grid(row=1, 
                           column=0, 
                           padx=20, 
@@ -34,7 +30,7 @@ class App(customtkinter.CTk):
                           sticky="ew", 
                           columnspan=2)
         
-        self.clock = ClockFrame(self, time=self.timer)
+        self.clock = ClockFrame(self)
         self.clock.grid(row=2,
                         column=0,
                         padx=20,
@@ -43,38 +39,13 @@ class App(customtkinter.CTk):
                         columnspan=2)
         
         self.button = customtkinter.CTkButton(self, 
-                                              text="Start", 
-                                              command=self.manage)
+                                              text="Start")
         self.button.grid(row=3, 
                           column=0, 
                           padx=20, 
                           pady=20, 
                           sticky="ew", 
                           columnspan=2)
-
-    def set_time(self):
-        self.timer.time = ConfigManager().load_param("pomodoro_time")
-        self.clock.time = self.timer
-
-    def manage(self):
-        if not self.timer.is_running:
-            if self.timer.is_finished:
-                self.set_time()
-            self.timer.toggle()
-            self.button.configure(text="Stop")
-            self.pomodoro()
-        else:
-            self.timer.toggle()
-            self.button.configure(text="Start")
-
-    def pomodoro(self):
-        if self.timer.is_running:
-            sleep = 200
-            self.clock.time = self.timer
-            if self.timer.is_finished:
-                sleep = 1000
-                self.bell()
-            self.after(sleep, self.pomodoro)
 
 
 class AppHeaderFrame(customtkinter.CTkFrame):
@@ -148,8 +119,3 @@ class ClockFrame(customtkinter.CTkFrame):
     @time.setter
     def time(self, value: str):
         self.label.configure(text=value)
-
-
-if __name__ == '__main__':
-    app = App()
-    app.mainloop()
