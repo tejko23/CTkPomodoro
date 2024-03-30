@@ -1,23 +1,19 @@
-from app import App
-from settings import ConfigManager
-from timer import Timer, TimerState, Observer
+from .ui import App, ConfigManager
+from .timer import Timer, TimerState
 
 
-class PomodoroEventHandler(Observer):
+class PomodoroEventHandler:
     def __init__(self, app: App):
         self.app: App = app
-        self.timer = Timer(ConfigManager().load_param("pomodoro_time"), 
-                           self.update)
+        self.timer = Timer(
+            ConfigManager().load_param("pomodoro_time"), self.update
+        )
         self._init_buttons_and_clock_commands()
 
     def update(self, state: TimerState) -> None:
         self.state = state
-        if self.state == TimerState.RUNNING:
-            self._set_to_running_cfg()
-        elif self.state == TimerState.STOPPED:
-            self._set_to_stopped_cfg()
-        elif self.state == TimerState.FINISHED:
-            self._set_to_finished_cfg()
+        method = getattr(self, "_set_to_" + state.value + "_cfg")
+        method()
 
     def stop(self) -> None:
         self.timer.toggle()

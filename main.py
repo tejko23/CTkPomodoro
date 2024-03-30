@@ -1,7 +1,11 @@
-import app
-import event_handlers
+from pomodoro import App, PomodoroEventHandler
 
-if __name__ == '__main__':
-    pomodoro_app = app.App()
-    event_handlers = event_handlers.PomodoroEventHandler(pomodoro_app)
+
+def main() -> None:
+    pomodoro_app = App()
+    event_handlers = PomodoroEventHandler(pomodoro_app)
     pomodoro_app.mainloop()
+
+
+if __name__ == "__main__":
+    main()
