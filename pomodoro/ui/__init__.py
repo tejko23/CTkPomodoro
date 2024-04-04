@@ -1,3 +1,3 @@
-from .app import App
-from .settings import SettingsWindow, ConfigManager
+from .view import Pomodoro
+from .settings import SettingsWindow
 from .spinbox import Spinbox

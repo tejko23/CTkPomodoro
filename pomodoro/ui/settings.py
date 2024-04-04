@@ -1,4 +1,3 @@
-import configparser
 from typing import Union
 from tkinter import ttk
 
@@ -7,30 +6,17 @@ import customtkinter
 from .spinbox import Spinbox
 
 
-class ConfigManager:
-    def __init__(self):
-        self.config = configparser.ConfigParser()
-        self.config.read("config.ini")
-
-    def save_param(self, key: str, value: str):
-        self.config["Settings"][key] = value
-        with open("config.ini", "w") as config_file:
-            self.config.write(config_file)
-
-    def load_param(self, key: str):
-        return self.config["Settings"][key]
-
-
 class SettingsWindow(customtkinter.CTkToplevel):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, master, config, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
         self.title("Settings")
         self.geometry("400x300")
-        self.config = ConfigManager()
 
         self.attributes("-topmost", True)
 
         self.columnconfigure((0, 1), weight=1)
+
+        self.config = config
 
         self.label = customtkinter.CTkLabel(
             self, text="Settings", font=customtkinter.CTkFont(size=26)
@@ -60,7 +46,4 @@ class SettingsWindow(customtkinter.CTkToplevel):
         )
 
     def _save_to_config(self):
-        self.config.save_param("pomodoro_time", self.get())
-
-    def get(self) -> Union[int, None]:
-        return self.pomodoro_time.get()
+        self.config.save_param("pomodoro_time", self.pomodoro_time.get())

@@ -1,10 +1,11 @@
-from pomodoro import App, PomodoroEventHandler
+from pomodoro import Model, Pomodoro, PomodoroPresenter
 
 
 def main() -> None:
-    pomodoro_app = App()
-    event_handlers = PomodoroEventHandler(pomodoro_app)
-    pomodoro_app.mainloop()
+    model = Model()
+    view = Pomodoro()
+    presenter = PomodoroPresenter(view, model)
+    presenter.run()
 
 
 if __name__ == "__main__":

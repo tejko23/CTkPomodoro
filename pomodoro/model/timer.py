@@ -1,4 +1,4 @@
-from typing import Protocol
+from typing import Callable, Protocol
 from datetime import datetime, timedelta
 from enum import Enum
 
@@ -9,28 +9,53 @@ class TimerState(Enum):
     FINISHED = "finished"
 
 
-class Observer(Protocol):
-    def update(self, state: TimerState): ...
+class Borg:
+    _shared_state = {}
+
+    def __init__(self):
+        self.__dict__ = self._shared_state
+
+
+class StateController(Borg):
+    def __init__(self):
+        super().__init__()
+        self.state = TimerState.STOPPED
+
+    def start(self):
+        self.state = TimerState.RUNNING
+
+    def stop(self):
+        self.state = TimerState.STOPPED
+
+    def finish(self):
+        self.state = TimerState.FINISHED
+
+    def is_running(self):
+        return self.state is TimerState.RUNNING
+
+    def is_finished(self):
+        return self.state is TimerState.FINISHED
+
+    def is_stopped(self):
+        return self.state is TimerState.STOPPED
 
 
 class Timer:
-    def __init__(self, time: str, fn):
-        self._post_state = fn
+    def __init__(self, time: str):
+        self.state = StateController()
         self._time = None
         self.time = time
-        self._end_time = datetime.now()
-        self.state = TimerState.STOPPED
 
     def __str__(self) -> str:
         return self.time
 
     @property
     def time(self) -> str:
-        if self.state == TimerState.RUNNING:
+        if self.state.is_running():
             if datetime.now() < self._end_time:
                 self._time = self._end_time - datetime.now()
             else:
-                self.set_state(TimerState.FINISHED)
+                self._time = timedelta()
         mm, ss = divmod(self._time.seconds, 60)
         return f"{mm:02}:{ss:02}"
 
@@ -50,18 +75,6 @@ class Timer:
                 "Invalid time format. Please provide time in the format \
                     'MM:SS' or 'M'."
             )
-        self.set_state(TimerState.STOPPED)
 
-    def set_state(self, state: TimerState):
-        self.state = state
-        self._post_state(self.state)
-
-    def toggle(self):
-        if self.state == TimerState.STOPPED:
-            self.set_state(TimerState.RUNNING)
-            self._end_time = datetime.now() + self._time
-        elif (
-            self.state == TimerState.RUNNING
-            or self.state == TimerState.FINISHED
-        ):
-            self.set_state(TimerState.STOPPED)
+    def refresh_end_time(self) -> None:
+        self._end_time = datetime.now() + self._time
