@@ -1,6 +1,6 @@
-from typing import Callable, Protocol
 from datetime import datetime, timedelta
 from enum import Enum
+from typing import Any, Dict, Optional
 
 
 class TimerState(Enum):
@@ -10,7 +10,7 @@ class TimerState(Enum):
 
 
 class Borg:
-    _shared_state = {}
+    _shared_state: Dict[str, Any] = {}
 
     def __init__(self):
         self.__dict__ = self._shared_state
@@ -43,8 +43,8 @@ class StateController(Borg):
 class Timer:
     def __init__(self, time: str):
         self.state = StateController()
-        self._time = None
-        self.time = time
+        self._time: timedelta = timedelta()
+        self.time: str = time
 
     def __str__(self) -> str:
         return self.time
@@ -77,4 +77,4 @@ class Timer:
             )
 
     def refresh_end_time(self) -> None:
-        self._end_time = datetime.now() + self._time
+        self._end_time: datetime = datetime.now() + self._time

@@ -1,5 +1,5 @@
 from tkinter import ttk
-from typing import Callable
+from typing import Callable, Optional
 
 import customtkinter
 
@@ -56,7 +56,9 @@ class Pomodoro(customtkinter.CTk):
         )
         self.button.configure(command=self.button_command)
 
-    def swap_button_text_decorator(self, command=None, *args, **kwargs):
+    def swap_button_text_decorator(
+        self, command: Optional[Callable] = None, *args, **kwargs
+    ):
         def wrapper(*args, **kwargs):
             if self.button.cget("text") == "Start":
                 self.button.configure(text="Stop")
@@ -68,7 +70,7 @@ class Pomodoro(customtkinter.CTk):
 
         return wrapper()
 
-    def run_job(self, time_ms, func, *args):
+    def run_job(self, time_ms: int, func: Callable, *args):
         self.job = self.after(time_ms, func, *args)
 
     def cancel_job(self):
@@ -88,7 +90,7 @@ class Pomodoro(customtkinter.CTk):
 
 
 class AppHeaderFrame(customtkinter.CTkFrame):
-    def __init__(self, master, command):
+    def __init__(self, master, command: Callable):
         super().__init__(master, fg_color="transparent")
         self.grid_columnconfigure(0, weight=1)
 
