@@ -29,7 +29,7 @@ class PomodoroPresenter:
         self.model = model
 
     def run(self) -> None:
-        self.view.init_ui(config=self.model.config, time=self.model.timer)
+        self.view.init_ui(config=self.model.config, time=str(self.model.timer))
         self.view.bind_update_button(self.reset_timer)
         self.view.bind_ss_button(self.handle_start_button)
         self.view.mainloop()
@@ -47,7 +47,7 @@ class PomodoroPresenter:
 
     def reset_timer(self) -> None:
         self.model.reset_timer()
-        self.view.set_clock_label(self.model.timer)
+        self.view.set_clock_label(str(self.model.timer))
 
     def pomodoro(self) -> None:
         if self.model.state.is_running():
@@ -58,7 +58,7 @@ class PomodoroPresenter:
             self._handle_stopped_state()
 
     def _update_running_state(self) -> None:
-        self.view.set_clock_label(self.model.timer)
+        self.view.set_clock_label(str(self.model.timer))
         self.model.finish_timer_if_done()
         self.view.run_job(200, self.pomodoro)
 
