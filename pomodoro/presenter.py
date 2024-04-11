@@ -1,8 +1,7 @@
 from __future__ import annotations
-from typing import Any, Callable, Protocol
+from typing import Callable, Protocol
 
-from .model import Timer, TimerState, ConfigManager
-from .model import Model
+from .model import ConfigManager, Model
 
 
 class View(Protocol):

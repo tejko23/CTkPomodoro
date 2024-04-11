@@ -52,10 +52,7 @@ class Timer:
     @property
     def time(self) -> str:
         if self.state.is_running():
-            if datetime.now() < self._end_time:
-                self._time = self._end_time - datetime.now()
-            else:
-                self._time = timedelta()
+            self._time = self._calculate_time()
         mm, ss = divmod(self._time.seconds, 60)
         return f"{mm:02}:{ss:02}"
 
@@ -76,5 +73,12 @@ class Timer:
                     'MM:SS' or 'M'."
             )
 
-    def refresh_end_time(self) -> None:
+    def set_end_time_to_correct(self) -> None:
         self._end_time: datetime = datetime.now() + self._time
+
+    def _calculate_time(self) -> timedelta:
+        now = datetime.now()
+        if now < self._end_time:
+            return self._end_time - now
+        else:
+            return timedelta()

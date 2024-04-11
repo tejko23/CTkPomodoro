@@ -1,9 +1,13 @@
 from tkinter import ttk
-from typing import Callable, Optional
+from typing import Callable, Optional, Protocol
 
 import customtkinter
 
 from .settings import SettingsWindow
+
+
+class Config(Protocol):
+    pass
 
 
 class Pomodoro(customtkinter.CTk):
@@ -13,7 +17,7 @@ class Pomodoro(customtkinter.CTk):
         self.title("Pomodoro")
         self.geometry("400x400")
 
-    def init_ui(self, config, time):
+    def init_ui(self, config: Config, time: str):
         self.job = None
         self.config = config
         self.grid_columnconfigure((0, 1), weight=1)
