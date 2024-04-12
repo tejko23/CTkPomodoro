@@ -1,9 +1,21 @@
+from __future__ import annotations
 from tkinter import ttk
-from typing import Callable, Optional, Protocol
+from typing import Any, Callable, Optional, Protocol, Type
 
 import customtkinter
 
 from .settings import SettingsWindow
+
+
+class SettingsWindowFactory:
+    def __init__(
+        self,
+        settings_window_class: Optional[Type[SettingsWindow]] = None,
+    ):
+        self.settings_window_class = settings_window_class or SettingsWindow
+
+    def create_settings_window(self, master, config):
+        return self.settings_window_class(master, config)
 
 
 class Config(Protocol):
@@ -11,14 +23,28 @@ class Config(Protocol):
 
 
 class Pomodoro(customtkinter.CTk):
-    def __init__(self):
+    def __init__(
+        self, settings_window_factory: Optional[SettingsWindowFactory] = None
+    ):
         super().__init__()
 
         self.title("Pomodoro")
         self.geometry("400x400")
 
-    def init_ui(self, config: Config, time: str):
+        self.settings_window_factory = (
+            settings_window_factory or SettingsWindowFactory()
+        )
+
         self.job = None
+        self.config: Config = None
+        self.header_frame: Optional[AppHeaderFrame] = None
+        self.update_btn: Optional[customtkinter.CTkButton] = None
+        self.clock: Optional[ClockFrame] = None
+        self.button_command: Optional[Callable[[], Any]] = None
+        self.button: Optional[customtkinter.CTkButton] = None
+        self.settings_window: Optional[SettingsWindow] = None
+
+    def init_ui(self, config: Config, time: str) -> None:
         self.config = config
         self.grid_columnconfigure((0, 1), weight=1)
 
@@ -39,26 +65,38 @@ class Pomodoro(customtkinter.CTk):
             row=2, column=0, padx=20, pady=20, sticky="ew", columnspan=2
         )
 
-        self.button_command: Callable = self.swap_button_text_decorator
+        self.button_command = self.swap_button_text_decorator
         self.button = customtkinter.CTkButton(
             self, text="Start", command=self.button_command
         )
         self.button.grid(
             row=3, column=0, padx=20, pady=20, sticky="ew", columnspan=2
         )
-        self.settings_window = None
 
     def set_clock_label(self, time: str) -> None:
-        self.clock.time = time
+        if self.clock is not None:
+            self.clock.time = time
+        else:
+            raise TypeError("NoneType")
 
-    def bind_update_button(self, fn: Callable) -> None:
-        self.update_btn.configure(command=fn)
+    def bind_update_button(self, command: Callable) -> None:
+        if not callable(command):
+            raise TypeError("'command' must be callable.")
+        if self.update_btn is not None:
+            self.update_btn.configure(command=command)
+        else:
+            raise TypeError("NoneType")
 
-    def bind_ss_button(self, fn: Callable) -> None:
+    def bind_ss_button(self, command: Callable) -> None:
+        if not callable(command):
+            raise TypeError("'command' must be callable.")
         self.button_command = lambda: self.swap_button_text_decorator(
-            command=fn
+            command=command
         )
-        self.button.configure(command=self.button_command)
+        if self.button is not None:
+            self.button.configure(command=self.button_command)
+        else:
+            raise TypeError("NoneType")
 
     def swap_button_text_decorator(
         self, command: Optional[Callable] = None, *args, **kwargs
@@ -88,7 +126,12 @@ class Pomodoro(customtkinter.CTk):
             self.settings_window is None
             or not self.settings_window.winfo_exists()
         ):
-            self.settings_window = SettingsWindow(self, self.config)
+            self.settings_window = (
+                self.settings_window_factory.create_settings_window(
+                    master=self,
+                    config=self.config,
+                )
+            )
         else:
             self.settings_window.focus()
 

@@ -68,9 +68,9 @@ def test_calculate_time_method_while_running(timer: Timer) -> None:
 
 
 def test_timer_property_timer_running_before_end_time(timer: Timer) -> None:
-    timer.state.start()
     two_minutes_ago = datetime.now() - timedelta(minutes=2)
     timer._end_time = two_minutes_ago + timer._time
+    timer.state.start()
     assert timer.time == "08:00"
 
 
