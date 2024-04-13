@@ -57,7 +57,7 @@ class Spinbox(customtkinter.CTkFrame):
             value = 60 if value > 60 else value
             self.entry.configure(text=str(value))
         except ValueError:
-            return
+            raise ValueError
         else:
             if self.command is not None:
                 self.command()
@@ -68,16 +68,10 @@ class Spinbox(customtkinter.CTkFrame):
             value = self.step_size if value < self.step_size else value
             self.entry.configure(text=str(value))
         except ValueError:
-            return
+            raise ValueError
         else:
             if self.command is not None:
                 self.command()
 
     def get(self) -> Union[int, None]:
-        try:
-            return self.entry.cget("text")
-        except ValueError:
-            return None
-
-    def set(self, value: int):
-        self.entry.configure(text=value)
+        return self.entry.cget("text")

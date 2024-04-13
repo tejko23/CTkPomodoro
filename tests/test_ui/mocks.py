@@ -1,4 +1,10 @@
+import customtkinter
 from pomodoro.ui.view import SettingsWindowFactory
+
+
+class AppMock(customtkinter.CTk):
+    def __init__(self):
+        super().__init__()
 
 
 class SettingsWindowMock:
