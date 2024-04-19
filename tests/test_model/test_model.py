@@ -43,3 +43,12 @@ def test_finish_timer_if_done(model: Model) -> None:
     assert model.state.is_finished() == False
     assert model.state.is_stopped() == False
     assert model.state.is_running() == True
+
+
+def test_set_time(model: Model) -> None:
+    model.set_time("pomodoro")
+
+
+def test_set_time_raise_value_error(model: Model) -> None:
+    with pytest.raises(ValueError):
+        model.set_time("something_wrong")

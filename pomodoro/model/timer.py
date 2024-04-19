@@ -45,6 +45,7 @@ class Timer:
         self.state = StateController()
         self._time: timedelta = timedelta()
         self.time: str = time
+        self._end_time: datetime = datetime.now() + self._time
 
     def __str__(self) -> str:
         return self.time
@@ -74,11 +75,16 @@ class Timer:
             )
 
     def set_end_time_to_correct(self) -> None:
-        self._end_time: datetime = datetime.now() + self._time
+        self._end_time = datetime.now() + self._time
+
+    def is_completed(self) -> bool:
+        """Checks if the timer has finished."""
+        current_time = datetime.now()
+        return current_time >= self._end_time
 
     def _calculate_time(self) -> timedelta:
-        now = datetime.now()
-        if now < self._end_time:
-            return self._end_time - now
+        current_time = datetime.now()
+        if current_time < self._end_time:
+            return self._end_time - current_time
         else:
             return timedelta()

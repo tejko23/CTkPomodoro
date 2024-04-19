@@ -35,17 +35,20 @@ def test_setting_clock_label(view: Pomodoro) -> None:
     assert view.clock.time == "05:00"
 
 
-def test_bind_update_button(view: Pomodoro) -> None:
-    view.update_btn = ButtonMock()
-    view.bind_update_button(lambda: "Test")
+def test_bind_button(view: Pomodoro) -> None:
+    view.pomodoro_time_btn = ButtonMock()
+    view.bind_button("pomodoro", lambda: "Test")
 
 
-def test_bind_update_button_raises_type_error(view: Pomodoro) -> None:
+def test_bind_button_raises_type_error(view: Pomodoro) -> None:
+    view.pomodoro_time_btn = ButtonMock()
     with pytest.raises(TypeError):
-        view.bind_update_button(lambda: "Test")
-    view.update_btn = ButtonMock()
-    with pytest.raises(TypeError):
-        view.bind_update_button("Test")
+        view.bind_button("pomodoro", "Test")
+
+
+def test_bind_button_raises_attribute_error(view: Pomodoro) -> None:
+    with pytest.raises(AttributeError):
+        view.bind_button("pomodoro", lambda: "Test")
 
 
 def test_bind_ss_button(view: Pomodoro) -> None:
@@ -63,7 +66,9 @@ def test_bind_ss_button_raises_type_error(view: Pomodoro) -> None:
 
 def test_swap_button_test_decorator(view: Pomodoro) -> None:
     view.button = ButtonMock()
-    view.update_btn = ButtonMock()
+    view.pomodoro_time_btn = ButtonMock()
+    view.break_time_btn = ButtonMock()
+    view.long_break_time_btn = ButtonMock()
     view.button.configure(text="Start")
     view.swap_button_text_decorator(lambda: "Test")
     view.button.configure(text="Stop")

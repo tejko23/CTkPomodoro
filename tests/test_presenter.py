@@ -18,7 +18,7 @@ class ViewMock:
 
     def set_clock_label(self, time: str) -> None: ...
 
-    def bind_update_button(self, fn: Callable) -> None: ...
+    def bind_button(self, type: str, fn: Callable) -> None: ...
 
     def bind_ss_button(self, fn: Callable) -> None: ...
 
@@ -43,8 +43,8 @@ def test_handle_start_button(presenter: PomodoroPresenter) -> None:
     assert presenter.model.state.is_running() == True
 
 
-def test_reset_timer(presenter: PomodoroPresenter) -> None:
-    presenter.reset_timer()
+def test_set_time(presenter: PomodoroPresenter) -> None:
+    presenter.set_time("pomodoro")
 
 
 def test_pomodoro_method_model_started(presenter: PomodoroPresenter) -> None:

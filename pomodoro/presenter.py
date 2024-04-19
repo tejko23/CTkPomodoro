@@ -17,26 +17,35 @@ class View(Protocol):
 
     def set_clock_label(self, time: str) -> None: ...
 
-    def bind_update_button(self, fn: Callable) -> None: ...
+    def bind_pomodoro_button(self, fn: Callable) -> None: ...
+
+    def bind_break_button(self, fn: Callable) -> None: ...
+
+    def bind_long_break_button(self, fn: Callable) -> None: ...
+
+    def bind_button(self, type: str, command: Callable) -> None: ...
 
     def bind_ss_button(self, fn: Callable) -> None: ...
 
 
 class PomodoroPresenter:
-    def __init__(self, view: View, model: Model):
+    def __init__(self, view: View, model: Model) -> None:
         self.view = view
         self.model = model
 
     def run(self) -> None:
         self.view.init_ui(config=self.model.config, time=str(self.model.timer))
-        self.view.bind_update_button(self.reset_timer)
+        self.view.bind_button("pomodoro", lambda: self.set_time("pomodoro"))
+        self.view.bind_button("break", lambda: self.set_time("break"))
+        self.view.bind_button(
+            "long_break", lambda: self.set_time("long_break")
+        )
         self.view.bind_ss_button(self.handle_start_button)
         self.view.mainloop()
 
     def handle_stop_button(self) -> None:
-        if self.model.state.is_finished():
-            self.reset_timer()
         self.model.stop_timer()
+        self.view.set_clock_label(str(self.model.timer))
         self.view.bind_ss_button(self.handle_start_button)
 
     def handle_start_button(self) -> None:
@@ -44,8 +53,8 @@ class PomodoroPresenter:
         self.view.bind_ss_button(self.handle_stop_button)
         self.pomodoro()
 
-    def reset_timer(self) -> None:
-        self.model.reset_timer()
+    def set_time(self, time_type: str):
+        self.model.set_time(time_type)
         self.view.set_clock_label(str(self.model.timer))
 
     def pomodoro(self) -> None:

@@ -38,7 +38,9 @@ class Pomodoro(customtkinter.CTk):
         self.job = None
         self.config: Config = None
         self.header_frame: Optional[AppHeaderFrame] = None
-        self.update_btn: Optional[customtkinter.CTkButton] = None
+        self.pomodoro_time_btn: Optional[customtkinter.CTkButton] = None
+        self.break_time_btn: Optional[customtkinter.CTkButton] = None
+        self.long_break_time_btn: Optional[customtkinter.CTkButton] = None
         self.clock: Optional[ClockFrame] = None
         self.button_command: Optional[Callable[[], Any]] = None
         self.button: Optional[customtkinter.CTkButton] = None
@@ -46,23 +48,35 @@ class Pomodoro(customtkinter.CTk):
 
     def init_ui(self, config: Config, time: str) -> None:
         self.config = config
-        self.grid_columnconfigure((0, 1), weight=1)
+        self.grid_columnconfigure((0, 1, 2), weight=1)
 
         self.header_frame = AppHeaderFrame(
             self, command=self.open_settings_window
         )
         self.header_frame.grid(
-            row=0, column=0, padx=10, pady=10, sticky="ew", columnspan=2
+            row=0, column=0, padx=10, pady=10, sticky="ew", columnspan=3
         )
 
-        self.update_btn = customtkinter.CTkButton(self, text="Reload time")
-        self.update_btn.grid(
-            row=1, column=0, padx=20, pady=20, sticky="ew", columnspan=2
+        self.pomodoro_time_btn = customtkinter.CTkButton(self, text="Pomodoro")
+        self.pomodoro_time_btn.grid(
+            row=1, column=0, padx=(20, 10), pady=10, sticky="ew", columnspan=1
+        )
+
+        self.break_time_btn = customtkinter.CTkButton(self, text="Break")
+        self.break_time_btn.grid(
+            row=1, column=1, padx=10, pady=10, sticky="ew", columnspan=1
+        )
+
+        self.long_break_time_btn = customtkinter.CTkButton(
+            self, text="Long break"
+        )
+        self.long_break_time_btn.grid(
+            row=1, column=2, padx=(10, 20), pady=10, sticky="ew", columnspan=1
         )
 
         self.clock = ClockFrame(self, time=time)
         self.clock.grid(
-            row=2, column=0, padx=20, pady=20, sticky="ew", columnspan=2
+            row=2, column=0, padx=20, pady=20, sticky="ew", columnspan=3
         )
 
         self.button_command = self.swap_button_text_decorator
@@ -70,7 +84,7 @@ class Pomodoro(customtkinter.CTk):
             self, text="Start", command=self.button_command
         )
         self.button.grid(
-            row=3, column=0, padx=20, pady=20, sticky="ew", columnspan=2
+            row=3, column=0, padx=20, pady=20, sticky="ew", columnspan=3
         )
 
     def set_clock_label(self, time: str) -> None:
@@ -79,13 +93,13 @@ class Pomodoro(customtkinter.CTk):
         else:
             raise TypeError("NoneType")
 
-    def bind_update_button(self, command: Callable) -> None:
+    def bind_button(self, time_type: str, command: Callable) -> None:
         if not callable(command):
             raise TypeError("'command' must be callable.")
-        if self.update_btn is not None:
-            self.update_btn.configure(command=command)
-        else:
-            raise TypeError("NoneType")
+        try:
+            getattr(self, f"{time_type}_time_btn").configure(command=command)
+        except Exception as e:
+            raise AttributeError from e
 
     def bind_ss_button(self, command: Callable) -> None:
         if not callable(command):
@@ -104,10 +118,10 @@ class Pomodoro(customtkinter.CTk):
         def wrapper(*args, **kwargs):
             if self.button.cget("text") == "Start":
                 self.button.configure(text="Stop")
-                self.update_btn.configure(state="disabled")
+                self._set_buttons_state(state="disabled")
             else:
                 self.button.configure(text="Start")
-                self.update_btn.configure(state="normal")
+                self._set_buttons_state(state="normal")
             return command() if command is not None else None
 
         return wrapper()
@@ -134,6 +148,11 @@ class Pomodoro(customtkinter.CTk):
             )
         else:
             self.settings_window.focus()
+
+    def _set_buttons_state(self, state: str) -> None:
+        self.pomodoro_time_btn.configure(state=state)
+        self.break_time_btn.configure(state=state)
+        self.long_break_time_btn.configure(state=state)
 
 
 class AppHeaderFrame(customtkinter.CTkFrame):

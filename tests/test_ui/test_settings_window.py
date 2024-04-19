@@ -12,4 +12,4 @@ def settings() -> SettingsWindow:
 
 def test_save_to_config_method(settings: SettingsWindow) -> None:
     settings.withdraw()
-    settings._save_to_config()
+    settings._save_to_config("break")
