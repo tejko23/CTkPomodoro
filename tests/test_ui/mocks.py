@@ -1,5 +1,4 @@
 import customtkinter
-from pomodoro.ui.view import SettingsWindowFactory
 
 
 class AppMock(customtkinter.CTk):
@@ -8,7 +7,7 @@ class AppMock(customtkinter.CTk):
 
 
 class SettingsWindowMock:
-    def __init__(self, master, config, *args, **kwargs):
+    def __init__(self, master, presenter, config, *args, **kwargs):
         pass
 
     def winfo_exists(self):

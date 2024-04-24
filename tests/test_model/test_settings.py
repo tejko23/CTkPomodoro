@@ -112,3 +112,18 @@ def test_set_long_break_time(config_manager) -> None:
     create_test_config(content)
     config_manager.set_long_break_time("20")
     assert config_manager.get_long_break_time() == "20"
+
+
+def test_get_long_break_interval(config_manager) -> None:
+    """Tests getting the 'long_break_interval' parameter."""
+    content = "[Settings]\nlong_break_interval=3"
+    create_test_config(content)
+    assert config_manager.get_long_break_interval() == "3"
+
+
+def test_set_long_break_interval(config_manager) -> None:
+    """Tests setting the 'long_break_time' parameter."""
+    content = "[Settings]\nlong_break_interval=3"
+    create_test_config(content)
+    config_manager.set_long_break_interval("4")
+    assert config_manager.get_long_break_interval() == "4"

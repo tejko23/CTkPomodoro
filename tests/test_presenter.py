@@ -14,11 +14,15 @@ class ViewMock:
 
     def cancel_job(self) -> None: ...
 
-    def init_ui(self, config: ConfigManager, time: str) -> None: ...
+    def init_ui(
+        self, presenter: PomodoroPresenter, config: ConfigManager, time: str
+    ) -> None: ...
 
     def set_clock_label(self, time: str) -> None: ...
 
-    def bind_button(self, type: str, fn: Callable) -> None: ...
+    def bind_time_type_button(self, type: str, fn: Callable) -> None: ...
+
+    def set_border_for_type_buttons(self, time_type: str) -> None: ...
 
     def bind_ss_button(self, fn: Callable) -> None: ...
 
@@ -45,6 +49,10 @@ def test_handle_start_button(presenter: PomodoroPresenter) -> None:
 
 def test_set_time(presenter: PomodoroPresenter) -> None:
     presenter.set_time("pomodoro")
+
+
+def test_set_sequence_interval(presenter: PomodoroPresenter) -> None:
+    presenter.set_sequence_interval(4)
 
 
 def test_pomodoro_method_model_started(presenter: PomodoroPresenter) -> None:

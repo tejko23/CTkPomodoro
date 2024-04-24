@@ -11,13 +11,17 @@ class Spinbox(customtkinter.CTkFrame):
         width: int = 100,
         height: int = 32,
         entry: str = "5",
-        step_size: Union[int, float] = 1,
+        step_size: int = 1,
+        min_value: int = 1,
+        max_value: int = 60,
         command: Optional[Callable] = None,
         **kwargs
     ):
         super().__init__(*args, width=width, height=height, **kwargs)
 
         self.step_size = step_size
+        self.min_value = min_value
+        self.max_value = max_value
         self.command = command
 
         self.configure(fg_color=("gray78", "gray28"))
@@ -54,7 +58,7 @@ class Spinbox(customtkinter.CTkFrame):
     def add_button_callback(self):
         try:
             value = int(self.entry.cget("text")) + self.step_size
-            value = 60 if value > 60 else value
+            value = self.max_value if value > self.max_value else value
             self.entry.configure(text=str(value))
         except ValueError:
             raise ValueError
@@ -65,7 +69,7 @@ class Spinbox(customtkinter.CTkFrame):
     def subtract_button_callback(self):
         try:
             value = int(self.entry.cget("text")) - self.step_size
-            value = self.step_size if value < self.step_size else value
+            value = self.min_value if value < self.min_value else value
             self.entry.configure(text=str(value))
         except ValueError:
             raise ValueError
@@ -73,5 +77,5 @@ class Spinbox(customtkinter.CTkFrame):
             if self.command is not None:
                 self.command()
 
-    def get(self) -> Union[int, None]:
+    def get(self) -> Union[str, None]:
         return self.entry.cget("text")

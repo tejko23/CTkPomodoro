@@ -13,7 +13,9 @@ class View(Protocol):
 
     def cancel_job(self) -> None: ...
 
-    def init_ui(self, config: ConfigManager, time: str) -> None: ...
+    def init_ui(
+        self, presenter: PomodoroPresenter, config: ConfigManager, time: str
+    ) -> None: ...
 
     def set_clock_label(self, time: str) -> None: ...
 
@@ -23,7 +25,9 @@ class View(Protocol):
 
     def bind_long_break_button(self, fn: Callable) -> None: ...
 
-    def bind_button(self, type: str, command: Callable) -> None: ...
+    def bind_time_type_button(self, type: str, command: Callable) -> None: ...
+
+    def set_border_for_type_buttons(self, time_type: str) -> None: ...
 
     def bind_ss_button(self, fn: Callable) -> None: ...
 
@@ -34,28 +38,33 @@ class PomodoroPresenter:
         self.model = model
 
     def run(self) -> None:
-        self.view.init_ui(config=self.model.config, time=str(self.model.timer))
-        self.view.bind_button("pomodoro", lambda: self.set_time("pomodoro"))
-        self.view.bind_button("break", lambda: self.set_time("break"))
-        self.view.bind_button(
-            "long_break", lambda: self.set_time("long_break")
+        self.view.init_ui(
+            presenter=self,
+            config=self.model.config,
+            time=self.model.timer.time,
         )
         self.view.bind_ss_button(self.handle_start_button)
+        self._change_current_type_button()
         self.view.mainloop()
 
     def handle_stop_button(self) -> None:
         self.model.stop_timer()
         self.view.set_clock_label(str(self.model.timer))
         self.view.bind_ss_button(self.handle_start_button)
+        self._change_current_type_button()
 
     def handle_start_button(self) -> None:
         self.model.start_timer()
         self.view.bind_ss_button(self.handle_stop_button)
         self.pomodoro()
 
-    def set_time(self, time_type: str):
+    def set_time(self, time_type: str) -> None:
         self.model.set_time(time_type)
         self.view.set_clock_label(str(self.model.timer))
+        self.view.set_border_for_type_buttons(time_type)
+
+    def set_sequence_interval(self, value: str) -> None:
+        self.model.sequence.set_interval(int(value))
 
     def pomodoro(self) -> None:
         if self.model.state.is_running():
@@ -76,3 +85,7 @@ class PomodoroPresenter:
 
     def _handle_stopped_state(self) -> None:
         self.view.cancel_job()
+
+    def _change_current_type_button(self) -> None:
+        type = self.model.sequence.get_current_type()
+        self.view.set_border_for_type_buttons(type)

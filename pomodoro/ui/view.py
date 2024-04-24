@@ -7,6 +7,19 @@ import customtkinter
 from .settings import SettingsWindow
 
 
+class Config(Protocol):
+    def get_pomodoro_time(self) -> str: ...
+    def get_break_time(self) -> str: ...
+    def get_long_break_time(self) -> str: ...
+    def get_long_break_interval(self) -> str: ...
+    def set_long_break_interval(self, value: str) -> None: ...
+
+
+class Presenter(Protocol):
+    def set_time(self, time_type: str) -> None: ...
+    def set_sequence_interval(self, value: str) -> None: ...
+
+
 class SettingsWindowFactory:
     def __init__(
         self,
@@ -14,12 +27,10 @@ class SettingsWindowFactory:
     ):
         self.settings_window_class = settings_window_class or SettingsWindow
 
-    def create_settings_window(self, master, config):
-        return self.settings_window_class(master, config)
-
-
-class Config(Protocol):
-    pass
+    def create_settings_window(
+        self, master, presenter: Presenter, config: Config
+    ):
+        return self.settings_window_class(master, presenter, config)
 
 
 class Pomodoro(customtkinter.CTk):
@@ -36,7 +47,8 @@ class Pomodoro(customtkinter.CTk):
         )
 
         self.job = None
-        self.config: Config = None
+        self.view: Optional[Presenter] = None
+        self.config: Optional[Config] = None
         self.header_frame: Optional[AppHeaderFrame] = None
         self.pomodoro_time_btn: Optional[customtkinter.CTkButton] = None
         self.break_time_btn: Optional[customtkinter.CTkButton] = None
@@ -46,7 +58,8 @@ class Pomodoro(customtkinter.CTk):
         self.button: Optional[customtkinter.CTkButton] = None
         self.settings_window: Optional[SettingsWindow] = None
 
-    def init_ui(self, config: Config, time: str) -> None:
+    def init_ui(self, presenter: Presenter, config: Config, time: str) -> None:
+        self.presenter = presenter
         self.config = config
         self.grid_columnconfigure((0, 1, 2), weight=1)
 
@@ -57,18 +70,28 @@ class Pomodoro(customtkinter.CTk):
             row=0, column=0, padx=10, pady=10, sticky="ew", columnspan=3
         )
 
-        self.pomodoro_time_btn = customtkinter.CTkButton(self, text="Pomodoro")
+        self.pomodoro_time_btn = customtkinter.CTkButton(
+            self,
+            text="Pomodoro",
+            command=lambda: self.presenter.set_time("pomodoro"),
+        )
         self.pomodoro_time_btn.grid(
             row=1, column=0, padx=(20, 10), pady=10, sticky="ew", columnspan=1
         )
 
-        self.break_time_btn = customtkinter.CTkButton(self, text="Break")
+        self.break_time_btn = customtkinter.CTkButton(
+            self,
+            text="Break",
+            command=lambda: self.presenter.set_time("break"),
+        )
         self.break_time_btn.grid(
             row=1, column=1, padx=10, pady=10, sticky="ew", columnspan=1
         )
 
         self.long_break_time_btn = customtkinter.CTkButton(
-            self, text="Long break"
+            self,
+            text="Long break",
+            command=lambda: self.presenter.set_time("long_break"),
         )
         self.long_break_time_btn.grid(
             row=1, column=2, padx=(10, 20), pady=10, sticky="ew", columnspan=1
@@ -93,13 +116,12 @@ class Pomodoro(customtkinter.CTk):
         else:
             raise TypeError("NoneType")
 
-    def bind_button(self, time_type: str, command: Callable) -> None:
-        if not callable(command):
-            raise TypeError("'command' must be callable.")
-        try:
-            getattr(self, f"{time_type}_time_btn").configure(command=command)
-        except Exception as e:
-            raise AttributeError from e
+    def set_border_for_type_buttons(self, time_type: str) -> None:
+        types = ["pomodoro", "break", "long_break"]
+        types.remove(time_type)
+        for type in types:
+            getattr(self, f"{type}_time_btn").configure(border_width=0)
+        getattr(self, f"{time_type}_time_btn").configure(border_width=2)
 
     def bind_ss_button(self, command: Callable) -> None:
         if not callable(command):
@@ -143,6 +165,7 @@ class Pomodoro(customtkinter.CTk):
             self.settings_window = (
                 self.settings_window_factory.create_settings_window(
                     master=self,
+                    presenter=self.presenter,
                     config=self.config,
                 )
             )

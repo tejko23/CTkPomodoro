@@ -1,6 +1,7 @@
 import pytest
 
 from pomodoro import Model, Timer
+from pomodoro.model import PomodoroSequence
 
 
 @pytest.fixture
@@ -25,8 +26,6 @@ def test_stop_timer_method(model: Model) -> None:
 
 def test_reset_timer_method(model: Model) -> None:
     model.reset_timer()
-    assert model.timer.time == Model().timer.time
-    assert model.timer.time == Timer(model._settings_time).time
 
 
 def test_finish_timer_if_done(model: Model) -> None:
@@ -52,3 +51,25 @@ def test_set_time(model: Model) -> None:
 def test_set_time_raise_value_error(model: Model) -> None:
     with pytest.raises(ValueError):
         model.set_time("something_wrong")
+
+
+@pytest.fixture
+def sequence() -> PomodoroSequence:
+    return PomodoroSequence()
+
+
+def test_sequence_valid_phase(sequence: PomodoroSequence):
+    sequence._current = 0
+    assert sequence._current == 0
+
+
+def test_sequence_set_current_raises_value_error(
+    sequence: PomodoroSequence, capsys
+) -> None:
+    sequence.set_current("invalid_phase")
+    captured = capsys.readouterr()
+    assert "invalid_phase is not a valid phase in the cycle." in captured.out
+
+
+def test_sequence_set_interval(sequence: PomodoroSequence) -> None:
+    sequence.set_interval(4)

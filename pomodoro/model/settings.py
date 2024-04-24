@@ -41,3 +41,9 @@ class ConfigManager:
 
     def set_long_break_time(self, value: str) -> None:
         self._set_param("long_break_time", value)
+
+    def get_long_break_interval(self) -> str:
+        return self._get_param("long_break_interval")
+
+    def set_long_break_interval(self, value: str) -> None:
+        self._set_param("long_break_interval", value)
