@@ -6,6 +6,8 @@ import customtkinter
 
 from .settings import SettingsWindow
 
+customtkinter.set_default_color_theme("./pomodoro/ui/assets/red_theme.json")
+
 
 class Config(Protocol):
     def get_pomodoro_time(self) -> str: ...
