@@ -24,7 +24,7 @@ class SettingsWindow(customtkinter.CTkToplevel):
     ):
         super().__init__(master, *args, **kwargs)
         self.title("Settings")
-        self.geometry("400x400")
+        self.geometry("400x350")
 
         self.attributes("-topmost", True)
 

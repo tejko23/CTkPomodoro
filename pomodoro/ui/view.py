@@ -42,7 +42,7 @@ class Pomodoro(customtkinter.CTk):
         super().__init__()
 
         self.title("Pomodoro")
-        self.geometry("400x400")
+        self.geometry("350x350")
 
         self.settings_window_factory = (
             settings_window_factory or SettingsWindowFactory()
