@@ -25,6 +25,9 @@ class SettingsWindow(customtkinter.CTkToplevel):
         super().__init__(master, *args, **kwargs)
         self.title("Settings")
         self.geometry("400x350")
+        self.after(
+            200, lambda: self.iconbitmap("./pomodoro/ui/assets/icon.ico")
+        )
 
         self.attributes("-topmost", True)
 

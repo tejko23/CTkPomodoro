@@ -3,6 +3,7 @@ from tkinter import ttk
 from typing import Any, Callable, Optional, Protocol, Type
 
 import customtkinter
+from PIL import Image
 
 from .settings import SettingsWindow
 
@@ -42,7 +43,8 @@ class Pomodoro(customtkinter.CTk):
         super().__init__()
 
         self.title("Pomodoro")
-        self.geometry("350x350")
+        self.geometry("400x350")
+        self.iconbitmap("./pomodoro/ui/assets/icon.ico")
 
         self.settings_window_factory = (
             settings_window_factory or SettingsWindowFactory()
@@ -185,10 +187,23 @@ class AppHeaderFrame(customtkinter.CTkFrame):
         super().__init__(master, fg_color="transparent")
         self.grid_columnconfigure(0, weight=1)
 
-        self.label = customtkinter.CTkLabel(
-            self, text="Pomodoro", font=customtkinter.CTkFont(size=30)
+        img = Image.open("./pomodoro/ui/assets/logo.png")
+        self.logo = customtkinter.CTkImage(
+            light_image=img, dark_image=img, size=(55, 55)
         )
-        self.label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+        self.img_label = customtkinter.CTkLabel(self, image=self.logo, text="")
+        self.img_label.grid(
+            row=0, column=0, padx=(5, 5), pady=(5, 10), sticky="w"
+        )
+
+        self.label = customtkinter.CTkLabel(
+            self,
+            text="Pomodoro",
+            font=customtkinter.CTkFont(size=26),
+        )
+        self.label.grid(
+            row=0, column=0, padx=(65, 10), pady=(15, 10), sticky="w"
+        )
 
         self.settings_btn = customtkinter.CTkButton(
             self, text="Settings", command=command
