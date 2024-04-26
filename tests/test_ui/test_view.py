@@ -1,13 +1,10 @@
 import pytest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
-from .mocks import (
-    ButtonMock,
-    ClockMock,
-    SettingsWindowMock,
-)
+
+from .mocks import ButtonMock, ClockMock, SettingsWindowMock, AppMock
 from pomodoro import Pomodoro
-from pomodoro.ui.view import SettingsWindowFactory, ClockFrame
+from pomodoro.ui.view import SettingsWindowFactory, ClockFrame, AppHeaderFrame
 
 
 @pytest.fixture
@@ -24,7 +21,8 @@ def clock(view: Pomodoro) -> ClockFrame:
 
 
 def test_init_ui(view: Pomodoro) -> None:
-    view.init_ui(presenter=Mock(), config=Mock(), time="10:00")
+    with patch("pomodoro.ui.view.AppHeaderFrame", return_value=Mock()):
+        view.init_ui(presenter=Mock(), config=Mock(), time="10:00")
 
 
 def test_setting_clock_label(view: Pomodoro) -> None:
@@ -41,7 +39,8 @@ def test_bind_time_type_button_raises_attribute_error(view: Pomodoro) -> None:
 
 
 def test_set_border_for_type_buttons(view: Pomodoro) -> None:
-    view.init_ui(presenter=Mock(), config=Mock(), time="10:00")
+    with patch("pomodoro.ui.view.AppHeaderFrame", return_value=Mock()):
+        view.init_ui(presenter=Mock(), config=Mock(), time="10:00")
     view.set_border_for_type_buttons("break")
 
 
@@ -86,7 +85,8 @@ def test_cancel_job(view: Pomodoro) -> None:
 
 
 def test_open_settings_window_creates_new_window(view: Pomodoro) -> None:
-    view.init_ui(presenter=Mock(), config=Mock(), time="10:00")
+    with patch("pomodoro.ui.view.AppHeaderFrame", return_value=Mock()):
+        view.init_ui(presenter=Mock(), config=Mock(), time="10:00")
     view.open_settings_window()
     assert view.settings_window.focus() == "Mocked window focused"
     assert view.settings_window is not None
@@ -94,7 +94,8 @@ def test_open_settings_window_creates_new_window(view: Pomodoro) -> None:
 
 
 def test_open_settings_window_focuses_existing(view: Pomodoro) -> None:
-    view.init_ui(presenter=Mock(), config=Mock(), time="10:00")
+    with patch("pomodoro.ui.view.AppHeaderFrame", return_value=Mock()):
+        view.init_ui(presenter=Mock(), config=Mock(), time="10:00")
     view.settings_window = view.settings_window_factory.create_settings_window(
         master=view,
         presenter=view.presenter,
@@ -119,3 +120,11 @@ def test_clock_frame_time_property(clock: ClockFrame) -> None:
 def test_clock_frame_time_setter(clock: ClockFrame) -> None:
     clock.time = "07:30"
     assert clock.time == "07:30"
+
+
+def test_app_header_frame() -> None:
+    with patch(
+        "pomodoro.ui.view.customtkinter.CTkLabel",
+        return_value=Mock(),
+    ):
+        AppHeaderFrame(master=AppMock(), command=Mock())

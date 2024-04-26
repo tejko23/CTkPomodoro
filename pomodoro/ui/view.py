@@ -1,4 +1,3 @@
-from __future__ import annotations
 from tkinter import ttk
 from typing import Any, Callable, Optional, Protocol, Type
 
@@ -6,8 +5,6 @@ import customtkinter
 from PIL import Image
 
 from .settings import SettingsWindow
-
-customtkinter.set_default_color_theme("./pomodoro/ui/assets/red_theme.json")
 
 
 class Config(Protocol):
@@ -42,9 +39,13 @@ class Pomodoro(customtkinter.CTk):
     ):
         super().__init__()
 
+        customtkinter.set_default_color_theme(
+            "./pomodoro/assets/red_theme.json"
+        )
         self.title("Pomodoro")
         self.geometry("400x350")
-        self.iconbitmap("./pomodoro/ui/assets/icon.ico")
+        self.resizable(width=False, height=False)
+        self.iconbitmap("./pomodoro/assets/icon.ico")
 
         self.settings_window_factory = (
             settings_window_factory or SettingsWindowFactory()
@@ -111,7 +112,7 @@ class Pomodoro(customtkinter.CTk):
             self, text="Start", command=self.button_command
         )
         self.button.grid(
-            row=3, column=0, padx=20, pady=20, sticky="ew", columnspan=3
+            row=3, column=0, padx=20, pady=10, sticky="ew", columnspan=3
         )
 
     def set_clock_label(self, time: str) -> None:
@@ -187,10 +188,11 @@ class AppHeaderFrame(customtkinter.CTkFrame):
         super().__init__(master, fg_color="transparent")
         self.grid_columnconfigure(0, weight=1)
 
-        img = Image.open("./pomodoro/ui/assets/logo.png")
         self.logo = customtkinter.CTkImage(
-            light_image=img, dark_image=img, size=(55, 55)
+            light_image=Image.open("./pomodoro/assets/pomodoro_logo.png"),
+            size=(55, 55),
         )
+
         self.img_label = customtkinter.CTkLabel(self, image=self.logo, text="")
         self.img_label.grid(
             row=0, column=0, padx=(5, 5), pady=(5, 10), sticky="w"

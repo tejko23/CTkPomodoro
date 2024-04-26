@@ -4,7 +4,7 @@ from typing import Optional
 
 class ConfigManager:
     def __init__(self, path: Optional[str] = None):
-        self.path = path or "config.ini"
+        self.path = path or "./pomodoro/config.ini"
         self.config = configparser.ConfigParser()
         self._load_config()
 

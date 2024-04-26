@@ -1,7 +1,6 @@
-# CustomTkinter Pomodoro App
-
+# CustomTkinter Pomodoro Timer App
 ## Introduction
-This is a Pomodoro app built using CustomTkinter and following the Model-View-Presenter (MVP) pattern. The app allows users to manage their work and break intervals efficiently using the Pomodoro technique.
+This is a very simple Pomodoro app built using CustomTkinter and following the Model-View-Presenter (MVP) pattern. The app allows users to manage their work and break intervals efficiently using the Pomodoro technique.
 
 ## Features
 * Set intervals for Pomodoro sessions, short breaks, and long breaks.
@@ -20,6 +19,12 @@ To run the Pomodoro app, follow these steps:
     ```
     python main.py
     ```
+
+## Packaging
+To create a .exe on Windows you can use pyinstaller.
+```
+pyinstaller --noconfirm --onedir --windowed --contents-directory "." --add-data "./pomodoro;pomodoro/" --collect-submodules "customtkinter" --icon "./pomodoro/assets/icon.ico" "main.py"
+```
 
 ## Usage
 Upon launching the app, you will see the main interface with options to start or set time type. You can also access the settings to customize the intervals according to your preferences.
