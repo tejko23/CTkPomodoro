@@ -1,4 +1,6 @@
 # CustomTkinter Pomodoro Timer App
+![Pomodoro Timer](images/interface.png "CustomTkinter Pomodoro Timer App")
+
 ## Introduction
 This is a very simple Pomodoro app built using CustomTkinter and following the Model-View-Presenter (MVP) pattern. The app allows users to manage their work and break intervals efficiently using the Pomodoro technique.
 
