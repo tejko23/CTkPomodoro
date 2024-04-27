@@ -15,7 +15,7 @@ To run the Pomodoro app, follow these steps:
 2. Ensure you have Python installed.
 3. Install the required dependencies using pip:
     ```
-    pip install customtkinter
+    pip install -r requirements.txt
     ```
 4. Run the app by executing the `main.py` file:
     ```
